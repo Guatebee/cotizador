@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cotiza tus recuerdos de miel · Guatebee</title>
+<link rel="icon" href="logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Figtree:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --bg:#FBF5E6; --surface:#FFFFFF; --soft:#F6EBCF; --line:#E6D6B3; --line-strong:#D9C69C;
+  --ink:#2A1E10; --muted:#5C4A33; --label:#7A5A1F;
+  --honey:#F2B21B; --honey-deep:#C98A0B; --sel:#FFF1CC;
+  --panel:#2A1E10; --panel-ink:#FBF5E6; --panel-muted:#E9DCC0; --panel-line:#5C4A33;
+  --err-bg:#FFE3D6; --err:#8A2A0A;
+  --display:'Young Serif',Georgia,'Times New Roman',serif;
+  --body:Figtree,'Segoe UI',system-ui,-apple-system,sans-serif;
+}
+*{box-sizing:border-box}
+html{color-scheme:light}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.45}
+[hidden]{display:none!important}
+button,input{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--honey);outline-offset:2px}
+h1,h2{text-wrap:balance}
+.serif{font-family:var(--display);font-weight:400}
+.num{font-variant-numeric:tabular-nums}
+header{background:var(--surface);border-bottom:4px solid var(--honey)}
+.top{max-width:1180px;margin:0 auto;padding:12px 16px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.logo{width:80px;height:66px;object-fit:contain;flex-shrink:0}
+.tag{margin:0;color:var(--muted);font-size:14px;max-width:46ch;flex:1 1 220px}
+main{max-width:1180px;margin:0 auto;padding:28px 16px 64px}
+.quote{display:grid;grid-template-columns:minmax(0,1fr);gap:28px;align-items:start}
+@media (min-width:920px){.quote{grid-template-columns:minmax(0,1fr) 400px;gap:48px}.summary{position:sticky;top:16px}}
+.intro h1{margin:0;font-size:clamp(28px,4vw,40px);line-height:1.1}
+.intro p{margin:6px 0 0;color:var(--muted)}
+.steps{display:flex;flex-direction:column;gap:28px}
+.step{display:flex;flex-direction:column;gap:12px;border:0;margin:0;padding:0;min-width:0}
+.step legend,.eyebrow{padding:0;font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--label);margin-bottom:12px}
+.eyebrow{margin:0}
+.sizes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.opt{border:2px solid var(--line);background:var(--surface);border-radius:16px;padding:14px 16px;text-align:left;display:flex;gap:12px;align-items:center;min-height:60px}
+.opt[aria-pressed="true"]{border-color:var(--honey-deep);background:var(--sel)}
+.opt.size{flex-direction:column;align-items:flex-start;gap:2px;min-height:88px}
+.opt .big{font-family:var(--display);font-size:24px}
+.opt .sub{font-size:13px;color:var(--muted)}
+.opt .dot{width:20px;height:20px;border-radius:50%;border:2px solid var(--line-strong);background:var(--surface);flex-shrink:0}
+.opt[aria-pressed="true"] .dot{border:6px solid var(--honey-deep)}
+.opt .txt{display:flex;flex-direction:column;gap:2px;flex:1;min-width:0}
+.opt .ttl{font-weight:600}
+.opt .price{font-weight:700}
+.accs{display:flex;flex-direction:column;gap:10px}
+.qty{display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:8px;max-width:360px}
+.qty button{width:48px;height:48px;border-radius:12px;border:0;background:var(--soft);display:grid;place-items:center;flex-shrink:0}
+.qty button.plus{background:var(--honey);color:#2A1E10}
+.qty input{flex:1;min-width:0;height:48px;border:0;background:transparent;text-align:center;font-size:26px;font-weight:700}
+.hint{margin:0;font-size:14px;color:var(--muted)}
+.hint b{color:var(--ink)}
+.fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(220px,100%),1fr));gap:14px}
+.field{display:flex;flex-direction:column;gap:6px;min-width:0}
+.field.wide{grid-column:1/-1}
+.field label{font-size:14px;font-weight:600}
+.field input{height:50px;padding:0 14px;border:1px solid var(--line-strong);border-radius:12px;background:var(--surface);font-size:16px;width:100%}
+.field input[aria-invalid="true"]{border-color:var(--err);border-width:2px}
+.summary{background:var(--panel);color:var(--panel-ink);border-radius:24px;padding:24px;display:flex;flex-direction:column;gap:14px}
+.summary h2{margin:0;font-size:24px}
+.rows{display:flex;flex-direction:column;gap:8px;font-size:15px}
+.row{display:flex;justify-content:space-between;gap:12px}
+.row span:first-child{color:var(--panel-muted)}
+.row span:last-child{text-align:right}
+.rule{height:1px;background:var(--panel-line)}
+.total{display:flex;justify-content:space-between;align-items:baseline;gap:12px}
+.total b{font-family:var(--display);font-weight:400;font-size:36px;color:var(--honey)}
+.disc{color:var(--honey)}
+.perk{margin:0;padding:10px 12px;border-radius:10px;background:var(--panel-line);font-size:14px}
+.btn{border:0;border-radius:14px;min-height:52px;padding:0 20px;font-weight:700;font-size:16px;display:inline-flex;align-items:center;justify-content:center;gap:10px;text-decoration:none;text-align:center}
+.btn.honey{background:var(--honey);color:#2A1E10}
+.btn.dark{background:var(--panel);color:var(--panel-ink)}
+.btn.ghost{background:transparent;border:2px solid var(--ink);color:var(--ink)}
+.btn[disabled]{opacity:.6;cursor:progress}
+.note{margin:0;font-size:13px;color:var(--panel-muted)}
+.alert{margin:0;padding:10px 12px;border-radius:10px;background:var(--err-bg);color:var(--err);font-size:14px;font-weight:600}
+
+.done{max-width:680px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
+.done-head{display:flex;gap:16px;align-items:center}
+.check{width:64px;height:64px;border-radius:50%;background:var(--honey);color:#2A1E10;display:grid;place-items:center;flex-shrink:0}
+.done h1{margin:0;font-size:clamp(26px,4vw,34px);line-height:1.15}
+.done-head p{margin:4px 0 0;color:var(--muted)}
+.next{background:var(--panel);color:var(--panel-ink);border-radius:20px;padding:20px;display:flex;flex-direction:column;gap:14px}
+.next p{margin:0}
+.next .big{font-family:var(--display);font-size:22px;line-height:1.25}
+.acts{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(220px,100%),1fr));gap:10px}
+.reds{display:flex;flex-wrap:wrap;gap:8px}
+.red-opt{min-height:46px;padding:0 18px;border-radius:999px;border:2px solid var(--line);background:var(--surface);font-weight:600;font-size:15px}
+.red-opt[aria-pressed="true"]{border-color:var(--honey-deep);background:var(--sel)}
+.gal{margin:0;display:flex;flex-direction:column;gap:8px}
+.gal-imgs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.gal-imgs img{width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:16px;display:block;background:var(--soft)}
+.gal figcaption{font-size:13px;color:var(--muted)}
+.copybox{display:flex;flex-direction:column;gap:12px}
+.howto{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:4px;font-size:15px}
+#msgtxt{width:100%;border-radius:12px;border:1px solid var(--panel-line);background:#FFFDF7;color:#2A1E10;padding:12px;font:14px/1.45 var(--body);resize:vertical}
+.btn.ok{background:#DDEFD2;color:#2F5D1A}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.msg{margin:0;font-size:14px;color:var(--panel-muted);min-height:20px}
+.paper-wrap{overflow-x:auto;box-shadow:0 10px 30px rgba(42,30,16,.14)}
+.paper{background:#fff;color:#2A1E10;padding:clamp(18px,4vw,36px);display:flex;flex-direction:column;gap:16px;font-size:13px;min-width:520px}
+.pl{display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center}
+.pl img{width:88px;height:72px;object-fit:contain}
+.pl p{margin:0;line-height:1.45}
+.meta{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:16px;align-items:end}
+.kv{display:grid;grid-template-columns:auto minmax(0,1fr);gap:6px 8px}
+.kv span:nth-child(odd){text-align:right}
+.kv span:nth-child(even){font-weight:700;border-bottom:1px solid #2A1E10}
+.fol{display:grid;grid-template-columns:auto auto;gap:6px 10px;font-weight:700}
+.fol span:nth-child(even){text-align:right}
+.tr{display:grid;grid-template-columns:40px 66px minmax(0,1fr) 76px 86px;gap:8px;padding:8px 6px;border-bottom:1px solid #EFE3C8}
+.tr.h{background:#F2B21B;font-weight:700;font-size:12px;border:0}
+.tr.light{color:#5C4A33}
+.r{text-align:right}
+.tt{display:grid;grid-template-columns:minmax(0,1fr) 100px 96px;gap:6px 8px;padding:10px 6px 0;font-weight:700}
+.tt span:nth-child(3n+2),.tt span:nth-child(3n){text-align:right}
+</style>
+</head>
+<body>
+<header>
+  <div class="top">
+    <img class="logo" id="logo" src="logo.png" alt="Guatebee, amor a las abejas">
+    <p class="tag">Miel 100% pura de apicultores guatemaltecos. Recuerdos para bodas, 15 años, despedidas de soltera, baby shower y eventos corporativos.</p>
+  </div>
+</header>
+<main>
+  <section id="v-form">
+    <form class="quote" id="form" novalidate>
+      <div class="steps">
+        <div class="intro">
+          <h1 class="serif">Cotiza tus recuerditos de miel</h1>
+          <p>Elige tu opción, indica la cantidad y mira el total al instante.</p>
+        </div>
+        <fieldset class="step"><legend>Tamaño del frasco</legend><div class="sizes" id="sizes"></div></fieldset>
+        <fieldset class="step"><legend>Presentación</legend><div class="accs" id="accs"></div></fieldset>
+        <figure class="gal" id="gal" hidden>
+          <div class="gal-imgs" id="gal-imgs"></div>
+          <figcaption id="gal-cap"></figcaption>
+        </figure>
+        <div class="step">
+          <label class="eyebrow" for="qty">Cantidad de recuerditos</label>
+          <div class="qty">
+            <button type="button" id="dec" aria-label="Restar uno"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M5 12h14"/></svg></button>
+            <input id="qty" class="num" type="number" inputmode="numeric" min="1" step="1" value="100">
+            <button type="button" id="inc" class="plus" aria-label="Sumar uno"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button>
+          </div>
+          <p class="hint">Escribe cualquier cantidad, desde 1.</p>
+        </div>
+        <fieldset class="step"><legend>Envío</legend><div class="accs" id="envs"></div></fieldset>
+        <fieldset class="step">
+          <legend>Tus datos</legend>
+          <div class="fields">
+            <div class="field wide"><label for="nombre">Nombre</label><input id="nombre" autocomplete="name" placeholder="Tu nombre completo"></div>
+            <div class="field"><label for="tel">Número de WhatsApp</label><input id="tel" type="tel" autocomplete="tel" placeholder="5555 5555"></div>
+            <div class="field"><label for="fecha">Fecha del evento</label><input id="fecha" type="date"></div>
+            <div class="field wide" id="red-field" hidden>
+              <span id="red-lbl" style="font-size:14px;font-weight:600">¿Por dónde nos escribiste?</span>
+              <div class="reds" id="reds" role="group" aria-labelledby="red-lbl">
+                <button type="button" class="red-opt" data-red="whatsapp" aria-pressed="true">WhatsApp</button>
+                <button type="button" class="red-opt" data-red="instagram" aria-pressed="false">Instagram</button>
+                <button type="button" class="red-opt" data-red="messenger" aria-pressed="false">Messenger</button>
+              </div>
+            </div>
+          </div>
+        </fieldset>
+      </div>
+      <aside class="summary" aria-live="polite">
+        <h2 class="serif">Tu cotización</h2>
+        <div class="rows">
+          <div class="row"><span>Producto</span><span id="s-prod"></span></div>
+          <div class="row"><span>Precio unitario</span><span id="s-unit" class="num"></span></div>
+          <div class="row"><span>Cantidad</span><span id="s-qty" class="num"></span></div>
+          <div class="row"><span>Subtotal</span><span id="s-sub" class="num"></span></div>
+          <div class="row" id="s-disc-row"><span>Descuento por volumen</span><span id="s-disc" class="num disc"></span></div>
+          <div class="row"><span>Envío</span><span id="s-env" class="num"></span></div>
+        </div>
+        <div class="rule"></div>
+        <div class="total"><span>Total</span><b id="s-total" class="num"></b></div>
+        <p class="perk" id="s-perk" hidden></p>
+        <p class="alert" id="err" role="alert" hidden></p>
+        <button class="btn honey" id="send" type="submit">Generar mi cotización</button>
+        <p class="note">Tarjeta personalizada a escoger del catálogo o con tu diseño. El color del listón lo afinamos contigo.</p>
+      </aside>
+    </form>
+  </section>
+
+  <section id="v-done" hidden>
+    <div class="done">
+      <div class="done-head">
+        <div class="check"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div>
+        <div><h1 class="serif" id="d-title">¡Listo!</h1><p id="d-sub"></p></div>
+      </div>
+      <div class="next">
+        <p class="big">En breve continuamos para resolver dudas o si deseas confirmar tu pedido.</p>
+        <p id="d-how"></p>
+        <div class="copybox" id="copybox" hidden>
+          <label for="msgtxt" class="sr">Texto de tu cotización</label>
+          <textarea id="msgtxt" readonly rows="6"></textarea>
+        </div>
+        <div class="acts">
+          <a class="btn honey" id="back-chat" href="#" target="_top" rel="noopener"></a>
+          <button class="btn ghost" id="save-img" type="button" style="border-color:var(--panel-ink);color:var(--panel-ink)">Descargar cotización</button>
+        </div>
+        <p class="msg" id="d-msg" aria-live="polite"></p>
+      </div>
+      <div class="paper-wrap"><article class="paper" id="paper"></article></div>
+      <div class="acts">
+        <button class="btn honey" id="edit" type="button">Regresar o modificar cotización</button>
+        <button class="btn ghost" id="again" type="button">Hacer otra cotización</button>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script>
+// =================== CONFIGURACIÓN (edita solo esta parte) ===================
+var CONFIG = {
+  API_URL: 'https://script.google.com/macros/s/AKfycbzr9Ye3kyZrB-55xqVR9cYDGaP2F_GfFHnZwJ_ZiheQZzrzapV6ZhtMb0-gt1lVyRTr/exec', // link de tu implementación de Apps Script
+  WHATSAPP: '502XXXXXXXX',   // número de Guatebee con 502, solo dígitos
+  INSTAGRAM: 'usuario_ig',   // usuario de Instagram sin @
+  FACEBOOK: 'pagina_fb'      // lo que va después de facebook.com/
+};
+// =============================================================================
+var FOTOS = {
+  '1-stick': ['fotos/1-stick-1.jpg', 'fotos/1-stick-2.jpg'],
+  '1-none':  ['fotos/1-none-1.jpg',  'fotos/1-none-2.jpg'],
+  '2-stick': ['fotos/2-stick-1.jpg', 'fotos/2-stick-2.jpg'],
+  '2-none':  ['fotos/2-none-1.jpg',  'fotos/2-none-2.jpg']
+};
+var CFG = {
+  origen: (function () { try { return (new URLSearchParams(location.search).get('origen') || '').toLowerCase().replace('facebook', 'messenger'); } catch (e) { return ''; } })(),
+  whatsapp: CONFIG.WHATSAPP, instagram: CONFIG.INSTAGRAM, facebook: CONFIG.FACEBOOK,
+  precios: { '1': { none: 9, stick: 17, spoon: 17 }, '2': { none: 16, stick: 24, spoon: 24 } },
+  envios: { interior: { nombre: 'Interior', costo: 40 }, ciudad: { nombre: 'Ciudad', costo: 35 }, otro: { nombre: 'Otro', costo: 0 } },
+  envioGratisDesde: 400, descuentoDesde: 100, descuentoUnidad: 1
+};
+(function(){
+  var P = CFG.precios;
+  var SIZE = { '1': '1 onza', '2': '2 onzas' };
+  var ACC = {
+    none:  { ttl: 'Listón y tarjeta', sub: 'Tarjeta personalizada y listón a elegir', short: 'con listón y tarjeta' },
+    stick: { ttl: '+ Palito mielero', sub: 'Incluye listón y tarjeta', short: 'con palito mielero' },
+    spoon: { ttl: '+ Cucharita de madera', sub: 'Incluye listón y tarjeta', short: 'con cucharita de madera' }
+  };
+  var CANAL = {
+    whatsapp:  { name: 'WhatsApp',  url: function (t) { return 'https://wa.me/' + CFG.whatsapp + '?text=' + encodeURIComponent(t); }, copy: false },
+    instagram: { name: 'Instagram', url: function (t) { return 'https://ig.me/m/' + CFG.instagram + '?text=' + encodeURIComponent(t); }, copy: true },
+    messenger: { name: 'Messenger', url: function (t) { return 'https://m.me/' + CFG.facebook + '?text=' + encodeURIComponent(t); }, copy: true }
+  };
+  // Un solo link: si no trae ?origen=, se detecta por la app desde donde se abrió.
+  var origen = CANAL[CFG.origen] ? CFG.origen : '';
+  if (!origen) {
+    var ua = navigator.userAgent || '';
+    if (/Instagram/i.test(ua)) origen = 'instagram';
+    else if (/FBAN|FBAV|FB_IAB|FBIOS|FB4A|Messenger|Orca/i.test(ua)) origen = 'messenger';
+  }
+  var detectado = !!origen;
+  if (!origen) origen = 'whatsapp';
+  var canal = CANAL[origen];
+
+  var $ = function (id) { return document.getElementById(id); };
+  var money = function (n) { return 'Q' + Number(n).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); };
+  var plain = function (n) { return Number(n).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); };
+  var esc = function (s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); };
+  var fLong = function (iso) { var d = new Date(iso + 'T12:00:00'); return isNaN(d) ? iso : d.toLocaleDateString('es-GT', { day: 'numeric', month: 'long', year: 'numeric' }); };
+  var prod = function (s, a) { return (s === '1' ? '1 oz ' : '2 oz ') + ACC[a].short; };
+  function calc(s, a, q) {
+    var unit = P[s][a], sub = unit * q, desc = q >= CFG.descuentoDesde ? CFG.descuentoUnidad * q : 0, neto = sub - desc;
+    var e = st.env, envio = !e || e === 'otro' || neto >= CFG.envioGratisDesde ? 0 : CFG.envios[e].costo;
+    return { unit: unit, sub: sub, desc: desc, neto: neto, envio: envio, total: neto + envio };
+  }
+
+  var st = { size: '1', acc: 'none', env: '' }, last = null, editando = 0;
+  var ENV = {
+    interior: { ttl: 'Envío al interior', sub: 'Fuera de la Ciudad de Guatemala' },
+    ciudad:   { ttl: 'Envío en la ciudad', sub: 'Dentro de la Ciudad de Guatemala' },
+    otro:     { ttl: 'Otro', sub: 'Lo coordinamos contigo' }
+  };
+  // Texto del envío: "Otro" nunca muestra monto
+  function envTxt(tipo, envio, fmt) {
+    if (!tipo) return 'Elige una opción';
+    if (tipo === 'otro') return 'Otro';
+    return envio ? (fmt || money)(envio) : 'Gratis';
+  }
+  function renderEnv(neto) {
+    $('envs').innerHTML = ['interior', 'ciudad', 'otro'].map(function (k) {
+      var price = k === 'otro' ? '' : 'Q' + CFG.envios[k].costo;
+      return '<button type="button" class="opt" data-env="' + k + '" aria-pressed="' + (st.env === k) + '"><span class="dot"></span><span class="txt"><span class="ttl">' + ENV[k].ttl + '</span><span class="sub">' + ENV[k].sub + '</span></span><span class="price">' + price + '</span></button>';
+    }).join('');
+  }
+  function qty() { return Math.max(0, parseInt($('qty').value, 10) || 0); }
+  function renderOpts() {
+    $('sizes').innerHTML = ['1', '2'].map(function (k) {
+      return '<button type="button" class="opt size" data-size="' + k + '" aria-pressed="' + (st.size === k) + '"><span class="big">' + SIZE[k] + '</span><span class="sub">Desde Q' + P[k].none + '</span></button>';
+    }).join('');
+    $('accs').innerHTML = ['none', 'stick', 'spoon'].map(function (k) {
+      return '<button type="button" class="opt" data-acc="' + k + '" aria-pressed="' + (st.acc === k) + '"><span class="dot"></span><span class="txt"><span class="ttl">' + ACC[k].ttl + '</span><span class="sub">' + ACC[k].sub + '</span></span><span class="price">Q' + P[st.size][k] + '</span></button>';
+    }).join('');
+    renderGaleria();
+    renderSummary();
+  }
+  // Fotos de ejemplo según tamaño y presentación (la cucharita no lleva fotos)
+  function renderGaleria() {
+    var f = (window.FOTOS || {})[st.size + '-' + st.acc];
+    $('gal').hidden = !f || !f.length;
+    if (!f || !f.length) { $('gal-imgs').innerHTML = ''; return; }
+    var nom = SIZE[st.size] + ' ' + ACC[st.acc].short;
+    $('gal-imgs').innerHTML = f.map(function (src, i) { return '<img src="' + src + '" alt="Ejemplo de recuerdo de miel de ' + nom + ' (' + (i + 1) + ')" loading="lazy">'; }).join('');
+    $('gal-cap').textContent = 'Ejemplos de ' + nom + '. La tarjeta y el color del listón se personalizan para tu evento.';
+  }
+  function renderSummary() {
+    var q = qty(), c = calc(st.size, st.acc, q);
+    $('s-prod').textContent = prod(st.size, st.acc);
+    $('s-unit').textContent = money(c.unit);
+    $('s-qty').textContent = q + ' u.';
+    $('s-sub').textContent = money(c.sub);
+    $('s-disc-row').hidden = !c.desc; $('s-disc').textContent = '−' + money(c.desc);
+    $('s-env').textContent = envTxt(st.env, c.envio);
+    renderEnv(c.neto);
+    $('s-total').textContent = money(c.total);
+    var perk = '';
+    if (q > 0 && st.env !== 'otro' && c.neto < CFG.envioGratisDesde) perk = 'Te faltan ' + money(CFG.envioGratisDesde - c.neto) + ' para envío gratis.';
+    $('s-perk').textContent = perk; $('s-perk').hidden = !perk;
+  }
+  $('sizes').addEventListener('click', function (e) { var b = e.target.closest('[data-size]'); if (b) { st.size = b.dataset.size; renderOpts(); } });
+  $('accs').addEventListener('click', function (e) { var b = e.target.closest('[data-acc]'); if (b) { st.acc = b.dataset.acc; renderOpts(); } });
+  $('envs').addEventListener('click', function (e) { var b = e.target.closest('[data-env]'); if (b) { st.env = b.dataset.env; renderSummary(); } });
+  $('qty').addEventListener('input', renderSummary);
+  $('inc').addEventListener('click', function () { $('qty').value = qty() + 1; renderSummary(); });
+  $('dec').addEventListener('click', function () { $('qty').value = Math.max(1, qty() - 1); renderSummary(); });
+  ['nombre', 'tel', 'fecha'].forEach(function (id) { $(id).addEventListener('input', function () { $(id).removeAttribute('aria-invalid'); }); });
+  renderOpts();
+  $('red-field').hidden = detectado;
+  $('reds').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-red]'); if (!b) return;
+    origen = b.dataset.red; canal = CANAL[origen];
+    [].forEach.call($('reds').children, function (c) { c.setAttribute('aria-pressed', String(c === b)); });
+  });
+
+  function showErr(m) { $('err').textContent = m; $('err').hidden = !m; }
+
+  $('form').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var nombre = $('nombre').value.trim(), tel = $('tel').value.trim(), fecha = $('fecha').value, q = qty();
+    var miss = [];
+    if (!nombre) miss.push('nombre');
+    if (tel.replace(/\D/g, '').length < 8) miss.push('tel');
+    if (!fecha) miss.push('fecha');
+    miss.forEach(function (id) { $(id).setAttribute('aria-invalid', 'true'); });
+    if (miss.length) { showErr('Completa tu nombre, un número de WhatsApp válido y la fecha del evento.'); $(miss[0]).focus(); return; }
+    if (q < 1) { showErr('Indica cuántos recuerditos necesitas.'); $('qty').focus(); return; }
+    if (!st.env) { showErr('Elige el tipo de envío.'); $('envs').scrollIntoView({ behavior: 'smooth', block: 'center' }); return; }
+    showErr('');
+    var btn = $('send'); btn.disabled = true; btn.textContent = 'Generando…';
+    var data = { nombre: nombre, telefono: tel, fechaEvento: fecha, tamano: st.size, presentacion: st.acc, cantidad: q, origen: origen, envio: st.env, folioAnterior: editando || 0 };
+    // Envía la cotización a Apps Script, que la guarda en el Google Sheet
+    fetch(CONFIG.API_URL, { method: 'POST', body: JSON.stringify(data) })
+      .then(function (res) { return res.json(); })
+      .then(function (j) {
+        if (!j || !j.ok) throw new Error(j && j.error || 'error');
+        btn.disabled = false; btn.textContent = 'Generar mi cotización'; editando = 0;
+        last = Object.assign({}, data, j.data);
+        renderDone();
+      })
+      .catch(function () {
+        btn.disabled = false; btn.textContent = editando ? 'Actualizar mi cotización' : 'Generar mi cotización';
+        showErr('No pudimos generar tu cotización. Revisa tu conexión e intenta de nuevo.');
+      });
+  });
+
+  function mensaje(x) {
+    return 'Hola Guatebee, esta es mi cotización No. ' + x.folio + ':\n' +
+      x.cantidad + ' frascos de miel de ' + SIZE[x.tamano] + ' ' + ACC[x.presentacion].short + ' a ' + money(x.unit) + ' c/u\n' +
+      (x.desc ? 'Descuento por volumen: -' + money(x.desc) + '\n' : '') +
+      'Envío: ' + (x.tipoEnvio === 'otro' ? 'otro' : ENV[x.tipoEnvio].ttl.replace('Envío ', '') + ', ' + (x.envio ? money(x.envio) : 'gratis')) + '\n' +
+      'Total: ' + money(x.total) + '\n' +
+      'Fecha del evento: ' + fLong(x.fechaEvento) + '\n' +
+      'Nombre: ' + x.nombre + ' · Tel: ' + x.telefono;
+  }
+
+  function renderDone() {
+    var x = last;
+    $('d-title').textContent = '¡Gracias, ' + x.nombre.split(/\s+/)[0] + '!';
+    $('d-sub').textContent = 'Tu cotización No. ' + x.folio + ' está lista.';
+    $('d-how').textContent = canal.copy
+      ? 'Toca «Regresar a ' + canal.name + '»: tu cotización se copia sola. En nuestro chat mantén presionado el cuadro de mensaje, toca Pegar y envíala.'
+      : 'Toca el botón para volver a nuestro chat de WhatsApp con tu cotización lista para enviar.';
+    $('copybox').hidden = true;
+    $('msgtxt').value = mensaje(x);
+    $('back-chat').textContent = canal.copy ? 'Regresar a ' + canal.name : 'Regresar a WhatsApp';
+    $('back-chat').href = canal.url(mensaje(x));
+    $('d-msg').textContent = '';
+    $('paper').innerHTML =
+      '<div class="pl"><img src="' + $('logo').src + '" alt="Guatebee"><p>Guatebee, brinda miel 100% pura, cosechada por apicultores guatemaltecos. Recuerdos de miel para tus eventos: bodas, 15 años, despedidas de soltera, baby shower, eventos corporativos etc.</p></div>' +
+      '<div class="meta"><div class="kv"><span>CLIENTE:</span><span>' + esc(x.nombre) + '</span><span>Nit:</span><span>CF</span><span>CONTACTO:</span><span>' + esc(x.telefono) + '</span><span>EVENTO:</span><span>' + esc(fLong(x.fechaEvento)) + '</span></div>' +
+      '<div class="fol"><span>COTIZACIÓN:</span><span>' + x.folio + '</span><span>FECHA:</span><span>' + esc(x.fecha) + '</span></div></div>' +
+      '<div><div class="tr h"><span>ITEM</span><span>CANTIDAD</span><span style="text-align:center">DESCRIPCIÓN</span><span class="r">PRECIO UNITARIO</span><span class="r">PRECIO TOTAL</span></div>' +
+      '<div class="tr num"><span>1</span><span>' + x.cantidad + '</span><span>Frascos de miel ' + SIZE[x.tamano] + ' ' + ACC[x.presentacion].short + ' (miel líquida o untable)</span><span class="r">' + plain(x.unit) + '</span><span class="r">' + plain(x.sub) + '</span></div>' +
+      (x.desc ? '<div class="tr num"><span></span><span></span><span>Descuento por volumen (100 unidades o más)</span><span class="r">-1.00</span><span class="r">-' + plain(x.desc) + '</span></div>' : '') +
+      '<div class="tr light"><span></span><span></span><span>Tarjeta personalizada a escoger del catálogo o brindar diseño en editable. Color del listón a elegir.</span><span class="r">–</span><span class="r">–</span></div>' +
+      '<div class="tt num"><span></span><span>SUB TOTAL</span><span style="border-top:1px solid #2A1E10">' + plain(x.sub - x.desc) + '</span><span></span><span>ENVÍO</span><span>' + envTxt(x.tipoEnvio, x.envio, plain) + '</span><span></span><span>TOTAL</span><span style="border-top:2px solid #2A1E10">' + money(x.total) + '</span></div></div>';
+    $('v-form').hidden = true; $('v-done').hidden = false;
+    window.scrollTo(0, 0);
+  }
+
+  // Copia síncrona dentro del toque (funciona en el navegador de Instagram/Messenger)
+  function copiar() {
+    var txt = $('msgtxt').value, ok = false;
+    var ta = document.createElement('textarea');
+    ta.value = txt; ta.setAttribute('readonly', '');
+    ta.style.position = 'fixed'; ta.style.top = '0'; ta.style.left = '0'; ta.style.opacity = '0'; ta.style.fontSize = '16px';
+    document.body.appendChild(ta);
+    ta.focus(); ta.select(); try { ta.setSelectionRange(0, txt.length); } catch (e) {}
+    try { ok = document.execCommand('copy'); } catch (e) {}
+    document.body.removeChild(ta);
+    try { if (navigator.clipboard) navigator.clipboard.writeText(txt).then(function () {}, function () {}); } catch (e) {}
+    return ok;
+  }
+  // Un solo toque: copia (respaldo) y abre el chat
+  // Copia la cotización en el mismo toque y abre el chat
+  $('back-chat').addEventListener('click', function () {
+    var ok = copiar();
+    if (canal.copy) $('d-msg').textContent = ok ? 'Cotización copiada. Pégala en el chat.' : 'Si no se copió, mantén presionado el texto de tu cotización y toca Copiar.';
+  });
+
+  // ---- Imagen de la cotización (PNG) ----
+  function dibujar() {
+    var x = last, W = 1080, pad = 70, c = document.createElement('canvas');
+    var rows = 4 + (x.desc ? 1 : 0);
+    c.width = W; c.height = 1180 + (x.desc ? 60 : 0);
+    var g = c.getContext('2d');
+    g.fillStyle = '#FFFFFF'; g.fillRect(0, 0, W, c.height);
+    g.fillStyle = '#F2B21B'; g.fillRect(0, 0, W, 14);
+    var logo = $('logo'); try { g.drawImage(logo, W / 2 - 75, 40, 150, 124); } catch (e) {}
+    var y = 200;
+    g.fillStyle = '#2A1E10'; g.textAlign = 'center';
+    g.font = '400 52px "Young Serif", Georgia, serif'; g.fillText('Cotización No. ' + x.folio, W / 2, y); y += 44;
+    g.font = '400 26px Figtree, Arial, sans-serif'; g.fillStyle = '#5C4A33';
+    g.fillText('Fecha: ' + x.fecha, W / 2, y); y += 70;
+    g.textAlign = 'left';
+    function kv(k, v) { g.font = '600 26px Figtree, Arial, sans-serif'; g.fillStyle = '#7A5A1F'; g.fillText(k, pad, y); g.font = '700 28px Figtree, Arial, sans-serif'; g.fillStyle = '#2A1E10'; g.fillText(v, pad + 230, y); y += 46; }
+    kv('Cliente', x.nombre); kv('Contacto', x.telefono); kv('Evento', fLong(x.fechaEvento));
+    y += 20;
+    g.fillStyle = '#F2B21B'; g.fillRect(pad, y, W - pad * 2, 60);
+    g.fillStyle = '#2A1E10'; g.font = '700 24px Figtree, Arial, sans-serif';
+    g.fillText('CANT.', pad + 20, y + 39); g.fillText('DESCRIPCIÓN', pad + 150, y + 39);
+    g.textAlign = 'right'; g.fillText('TOTAL', W - pad - 20, y + 39); g.textAlign = 'left';
+    y += 60;
+    function line(a, b, cc, color) {
+      g.fillStyle = color || '#2A1E10'; g.font = '400 26px Figtree, Arial, sans-serif';
+      g.fillText(a, pad + 20, y + 44); g.fillText(b, pad + 150, y + 44);
+      g.textAlign = 'right'; g.fillText(cc, W - pad - 20, y + 44); g.textAlign = 'left';
+      g.fillStyle = '#EFE3C8'; g.fillRect(pad, y + 70, W - pad * 2, 2); y += 72;
+    }
+    line(String(x.cantidad), SIZE[x.tamano] + ' ' + ACC[x.presentacion].short + ' · ' + money(x.unit) + ' c/u', money(x.sub));
+    if (x.desc) line('', 'Descuento por volumen (Q1 por unidad)', '-' + money(x.desc));
+    line('', x.tipoEnvio === 'otro' ? 'Envío' : ENV[x.tipoEnvio].ttl, envTxt(x.tipoEnvio, x.envio));
+    y += 30;
+    g.textAlign = 'right'; g.fillStyle = '#2A1E10';
+    g.font = '600 28px Figtree, Arial, sans-serif'; g.fillText('TOTAL', W - pad - 260, y + 30);
+    g.font = '400 56px "Young Serif", Georgia, serif'; g.fillText(money(x.total), W - pad - 20, y + 36);
+    g.textAlign = 'left'; y += 100;
+    g.fillStyle = '#5C4A33'; g.font = '400 24px Figtree, Arial, sans-serif';
+    g.fillText('Tarjeta personalizada a escoger del catálogo o con tu diseño. Color del listón a elegir.', pad, y); y += 70;
+    g.fillStyle = '#2A1E10'; g.fillRect(0, c.height - 150, W, 150);
+    g.fillStyle = '#F2B21B'; g.textAlign = 'center'; g.font = '400 32px "Young Serif", Georgia, serif';
+    g.fillText('En breve continuamos para resolver dudas', W / 2, c.height - 88);
+    g.fillText('o si deseas confirmar tu pedido.', W / 2, c.height - 44);
+    return c;
+  }
+  $('save-img').addEventListener('click', function () {
+    if (!last) return;
+    var c = dibujar(), name = 'cotizacion-guatebee-' + last.folio + '.png';
+    c.toBlob(function (blob) {
+      var file = null; try { file = new File([blob], name, { type: 'image/png' }); } catch (e) {}
+      if (file && navigator.canShare && navigator.canShare({ files: [file] })) {
+        navigator.share({ files: [file], title: 'Cotización Guatebee' }).catch(function () { descargar(blob, name); });
+      } else { descargar(blob, name); }
+    }, 'image/png');
+  });
+  function descargar(blob, name) {
+    try {
+      var a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name;
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      $('d-msg').textContent = 'Cotización descargada.';
+    } catch (e) { $('d-msg').textContent = 'Si no se guardó, toma captura de pantalla de tu cotización.'; }
+  }
+
+  // Regresa al formulario con los mismos datos para cambiarlos
+  $('edit').addEventListener('click', function () {
+    editando = last ? last.folio : 0;
+    $('send').textContent = 'Actualizar mi cotización';
+    $('v-done').hidden = true; $('v-form').hidden = false; renderSummary(); window.scrollTo(0, 0);
+  });
+  $('again').addEventListener('click', function () {
+    editando = 0; $('send').textContent = 'Generar mi cotización';
+    $('nombre').value = ''; $('tel').value = ''; $('fecha').value = ''; $('qty').value = 100; renderSummary();
+    $('v-done').hidden = true; $('v-form').hidden = false; window.scrollTo(0, 0);
+  });
+})();
+</script>
+</body>
+</html>
