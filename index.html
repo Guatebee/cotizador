@@ -230,10 +230,12 @@ var CONFIG = {
 };
 // =============================================================================
 var FOTOS = {
-  '1-stick': ['fotos/1-stick-1.jpg', 'fotos/1-stick-2.jpg'],
-  '1-none':  ['fotos/1-none-1.jpg',  'fotos/1-none-2.jpg'],
-  '2-stick': ['fotos/2-stick-1.jpg', 'fotos/2-stick-2.jpg'],
-  '2-none':  ['fotos/2-none-1.jpg',  'fotos/2-none-2.jpg']
+     var FOTOS = {
+     '1-stick': ['1-stick-1.jpg', '1-stick-2.jpg'],
+     '1-none':  ['1-none-1.jpg',  '1-none-2.jpg'],
+     '2-stick': ['2-stick-1.jpg', '2-stick-2.jpg'],
+     '2-none':  ['2-none-1.jpg',  '2-none-2.jpg']
+   };
 };
 var CFG = {
   origen: (function () { try { return (new URLSearchParams(location.search).get('origen') || '').toLowerCase().replace('facebook', 'messenger'); } catch (e) { return ''; } })(),
