@@ -229,14 +229,12 @@ var CONFIG = {
   FACEBOOK: 'guatebee'      // lo que va después de facebook.com/
 };
 // =============================================================================
-var FOTOS = {
-     var FOTOS = {
+   var FOTOS = {
      '1-stick': ['1-stick-1.jpg', '1-stick-2.jpg'],
      '1-none':  ['1-none-1.jpg',  '1-none-2.jpg'],
      '2-stick': ['2-stick-1.jpg', '2-stick-2.jpg'],
      '2-none':  ['2-none-1.jpg',  '2-none-2.jpg']
    };
-};
 var CFG = {
   origen: (function () { try { return (new URLSearchParams(location.search).get('origen') || '').toLowerCase().replace('facebook', 'messenger'); } catch (e) { return ''; } })(),
   whatsapp: CONFIG.WHATSAPP, instagram: CONFIG.INSTAGRAM, facebook: CONFIG.FACEBOOK,
